@@ -8,8 +8,9 @@ from telegram.ext import (
 )
 
 TOKEN = os.getenv("BOT_TOKEN")
+PORT = int(os.environ.get("PORT", 10000))
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-# ضع Telegram User ID الخاص بك هنا للتجربة
 TEST_VIP_USERS = {
     5525081459
 }
@@ -57,15 +58,11 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     if is_vip(user_id):
-        message = (
-            "⭐ حسابك VIP\n\n"
-            "تم تفعيل عضوية VIP لديك."
-        )
+        message = "⭐ حسابك VIP\n\nتم تفعيل عضوية VIP لديك."
     else:
         message = (
             "👤 حسابك مجاني\n\n"
-            "يمكنك الترقية إلى VIP للحصول على "
-            "مميزات إضافية."
+            "يمكنك الترقية إلى VIP للحصول على مميزات إضافية."
         )
 
     await update.message.reply_text(message)
@@ -75,7 +72,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    if query.data == "vip" or query.data == "prices":
+    if query.data in ("vip", "prices"):
         await query.message.reply_text(
             "⭐ اشتراك VIP\n\n"
             "• استخدام أكثر\n"
@@ -89,12 +86,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif query.data == "status":
-        user_id = query.from_user.id
-
-        if is_vip(user_id):
-            await query.message.reply_text(
-                "⭐ أنت مشترك VIP."
-            )
+        if is_vip(query.from_user.id):
+            await query.message.reply_text("⭐ أنت مشترك VIP.")
         else:
             await query.message.reply_text(
                 "👤 أنت على الحساب المجاني.\n\n"
@@ -108,13 +101,15 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("vip", vip))
     app.add_handler(CommandHandler("status", status))
+    app.add_handler(CallbackQueryHandler(button_handler))
 
-    app.add_handler(
-        CallbackQueryHandler(button_handler)
+    print("Bot is running with webhook...")
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=WEBHOOK_URL,
     )
-
-    print("Bot is running...")
-    app.run_polling()
 
 
 if __name__ == "__main__":
