@@ -1,4 +1,5 @@
 import os
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -11,6 +12,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.environ.get("PORT", 10000))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL") or os.getenv("RENDER_EXTERNAL_URL")
 
+# Telegram User ID الخاص بك للتجربة
 TEST_VIP_USERS = {
     5525081459
 }
@@ -34,7 +36,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "أهلاً بك 🤖\n\n"
         "اختر الخدمة التي تريدها:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
 
@@ -58,20 +60,21 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     if is_vip(user_id):
-        message = (
+        await update.message.reply_text(
             "⭐ حسابك VIP\n\n"
             "تم تفعيل عضوية VIP لديك."
         )
     else:
-        message = (
+        await update.message.reply_text(
             "👤 حسابك مجاني\n\n"
             "يمكنك الترقية إلى VIP للحصول على مميزات إضافية."
         )
 
-    await update.message.reply_text(message)
 
-
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button_handler(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+):
     query = update.callback_query
     await query.answer()
 
@@ -82,9 +85,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• أولوية في الخدمة\n"
             "• ميزات حصرية\n\n"
             "💰 الأسعار:\n"
-            "شهر: 5$\n"
-            "3 أشهر: 12$\n"
-            "سنة: 35$\n\n"
+            "• شهر: 5$\n"
+            "• 3 أشهر: 12$\n"
+            "• سنة: 35$\n\n"
             "💳 الدفع سيتم تفعيله قريباً."
         )
 
@@ -101,6 +104,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
+    if not TOKEN:
+        raise RuntimeError("BOT_TOKEN is not set")
+
+    if not WEBHOOK_URL:
+        raise RuntimeError(
+            "WEBHOOK_URL or RENDER_EXTERNAL_URL is not set"
+        )
+
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
