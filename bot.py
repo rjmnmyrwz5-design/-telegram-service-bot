@@ -11,7 +11,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 # ضع Telegram User ID الخاص بك هنا للتجربة
 TEST_VIP_USERS = {
-    123456789
+    5525081459
 }
 
 
