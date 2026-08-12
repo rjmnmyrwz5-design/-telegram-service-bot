@@ -7,9 +7,8 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "أهلاً بك 👋\n"
-        "البوت شغال ✅\n"
-        "الخدمات المدفوعة قيد التجهيز."
+        "أهلاً بك 🤖\n"
+        "البوت شغال، والخدمات المدفوعة قيد التجهيز."
     )
 
 
