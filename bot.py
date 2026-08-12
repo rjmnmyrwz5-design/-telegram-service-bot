@@ -9,7 +9,7 @@ from telegram.ext import (
 
 TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.environ.get("PORT", 10000))
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL") or os.getenv("RENDER_EXTERNAL_URL")
 
 TEST_VIP_USERS = {
     5525081459
@@ -58,7 +58,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
     if is_vip(user_id):
-        message = "⭐ حسابك VIP\n\nتم تفعيل عضوية VIP لديك."
+        message = (
+            "⭐ حسابك VIP\n\n"
+            "تم تفعيل عضوية VIP لديك."
+        )
     else:
         message = (
             "👤 حسابك مجاني\n\n"
@@ -87,7 +90,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data == "status":
         if is_vip(query.from_user.id):
-            await query.message.reply_text("⭐ أنت مشترك VIP.")
+            await query.message.reply_text(
+                "⭐ أنت مشترك VIP."
+            )
         else:
             await query.message.reply_text(
                 "👤 أنت على الحساب المجاني.\n\n"
@@ -108,7 +113,9 @@ def main():
     app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        WEBHOOK_URL = os.getenv("WEBHOOK_URL") or os.getenv("RENDER_EXTERNAL_URL")
+        webhook_url=WEBHOOK_URL,
+    )
+
 
 if __name__ == "__main__":
     main()
